@@ -146,6 +146,71 @@ const demoExams = [
         createdAt: new Date('2024-01-05'),
         scheduledStart: new Date('2024-01-18T14:00:00'),
         scheduledEnd: new Date('2024-01-18T14:45:00')
+    },
+    {
+        id: 'EXAM004',
+        name: 'History - World War II',
+        teacherId: 'T001',
+        date: '2024-01-22',
+        duration: 60,
+        description: 'Major events and outcomes of World War II',
+        difficulty: 'Medium',
+        status: 'available',
+        questions: [
+            {
+                id: 1,
+                text: 'In which year did World War II begin?',
+                options: ['1937', '1939', '1941', '1945'],
+                correct: 1,
+                explanation: 'World War II began in 1939 with the invasion of Poland'
+            },
+            {
+                id: 2,
+                text: 'Which country was NOT part of the Allied Powers?',
+                options: ['United States', 'Soviet Union', 'Germany', 'United Kingdom'],
+                correct: 2,
+                explanation: 'Germany was part of the Axis Powers, not the Allied Powers'
+            },
+            {
+                id: 3,
+                text: 'What was the code name for the Allied invasion of Normandy?',
+                options: ['Operation Overlord', 'Operation Barbarossa', 'Operation Market Garden', 'Operation Torch'],
+                correct: 0,
+                explanation: 'Operation Overlord was the code name for the D-Day invasion'
+            }
+        ],
+        createdAt: new Date('2024-01-15'),
+        scheduledStart: null,
+        scheduledEnd: null
+    },
+    {
+        id: 'EXAM005',
+        name: 'Biology - Cell Structure',
+        teacherId: 'T002',
+        date: '2024-01-25',
+        duration: 50,
+        description: 'Understanding cell organelles and their functions',
+        difficulty: 'Easy',
+        status: 'available',
+        questions: [
+            {
+                id: 1,
+                text: 'Which organelle is known as the powerhouse of the cell?',
+                options: ['Nucleus', 'Mitochondria', 'Ribosome', 'Golgi apparatus'],
+                correct: 1,
+                explanation: 'Mitochondria produce ATP, the energy currency of the cell'
+            },
+            {
+                id: 2,
+                text: 'What is the function of the cell membrane?',
+                options: ['Protein synthesis', 'Energy production', 'Controls what enters and exits the cell', 'DNA storage'],
+                correct: 2,
+                explanation: 'The cell membrane regulates the movement of substances in and out of the cell'
+            }
+        ],
+        createdAt: new Date('2024-01-16'),
+        scheduledStart: null,
+        scheduledEnd: null
     }
 ];
 

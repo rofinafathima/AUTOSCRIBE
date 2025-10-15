@@ -7,7 +7,7 @@ let timerInterval = null;
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize sample data
-    initializeSampleData();
+    // initializeSampleData(); // Commented out - not needed
     
     // Check if user is logged in
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -84,15 +84,15 @@ function loadMockExams() {
                 <span><i class="fas fa-question-circle"></i> ${exam.questions.length} questions</span>
             </div>
             <p>Practice with this ${exam.subject} exam to test your knowledge.</p>
-            <button class="btn btn-outline" onclick="startMockExam('${exam.id}')">
+            <button class="btn btn-outline" onclick="startMockExamFromList('${exam.id}')">
                 <i class="fas fa-play"></i> Start Practice
             </button>
         </div>
     `).join('');
 }
 
-// Start mock exam
-function startMockExam(examId) {
+// Start mock exam (OLD VERSION - RENAMED TO AVOID CONFLICT WITH ENHANCED VERSION)
+function startMockExamFromList(examId) {
     const exam = MOCK_EXAMS.find(e => e.id === examId);
     if (!exam) return;
 

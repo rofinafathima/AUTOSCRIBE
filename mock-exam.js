@@ -113,23 +113,23 @@ function previousQuestion() {
     }
 }
 
-// Start the mock exam
-function startMockExam() {
+// Start the mock exam (OLD VERSION - RENAMED TO AVOID CONFLICT)
+function startMockExamOld() {
     mockExamSection.style.display = 'none';
     mockExamInterface.style.display = 'block';
     initMockExam();
 }
 
-// End the mock exam
-function endMockExam() {
+// End the mock exam (OLD VERSION - RENAMED TO AVOID CONFLICT)
+function endMockExamOld() {
     if (confirm('Are you sure you want to end the exam? Your progress will be saved.')) {
         clearInterval(examTimer);
-        submitMockExam();
+        submitMockExamOld();
     }
 }
 
-// Submit the mock exam
-function submitMockExam() {
+// Submit the mock exam (OLD VERSION - RENAMED TO AVOID CONFLICT)
+function submitMockExamOld() {
     clearInterval(examTimer);
     
     // Calculate score

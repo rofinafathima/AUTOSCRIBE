@@ -6,22 +6,22 @@
 }
 
 :root {
-    --primary-color: #6366f1;
-    --secondary-color: #8b5cf6;
-    --accent-color: #06b6d4;
-    --success-color: #10b981;
-    --warning-color: #f59e0b;
-    --error-color: #ef4444;
+    --primary-color: #93c5fd;
+    --secondary-color: #c4b5fd;
+    --accent-color: #7dd3fc;
+    --success-color: #86efac;
+    --warning-color: #fcd34d;
+    --error-color: #fca5a5;
     --text-primary: #1f2937;
     --text-secondary: #6b7280;
     --bg-primary: #ffffff;
-    --bg-secondary: #f9fafb;
-    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    --bg-gradient-alt: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
-    --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-heavy: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.2);
+    --bg-secondary: #f0f9ff;
+    --bg-gradient: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 50%, #fce7f3 100%);
+    --bg-gradient-alt: linear-gradient(135deg, #bfdbfe 0%, #c7d2fe 50%, #fbcfe8 100%);
+    --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+    --shadow-heavy: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    --shadow-glow: 0 0 20px rgba(147, 197, 253, 0.3);
     --border-radius: 16px;
     --border-radius-lg: 24px;
     --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -46,9 +46,9 @@ body::before {
     width: 100%;
     height: 100%;
     background: 
-        radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
+        radial-gradient(circle at 20% 80%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(196, 181, 253, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(125, 211, 252, 0.1) 0%, transparent 50%);
     z-index: -2;
     animation: backgroundPulse 8s ease-in-out infinite;
 }
@@ -139,12 +139,12 @@ body::before {
 
 .logo i {
     font-size: 4rem;
-    background: linear-gradient(45deg, #6366f1, #8b5cf6, #06b6d4, #10b981);
+    background: linear-gradient(45deg, #93c5fd, #c4b5fd, #7dd3fc, #86efac);
     background-size: 300% 300%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.3));
+    filter: drop-shadow(0 0 20px rgba(147, 197, 253, 0.4));
     animation: iconPulse 2s ease-in-out infinite, gradientShift 3s ease-in-out infinite;
 }
 
@@ -161,8 +161,8 @@ body::before {
 .logo h1 {
     font-size: 3.5rem;
     font-weight: 800;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    background: linear-gradient(45deg, #6366f1, #8b5cf6, #06b6d4, #10b981, #f59e0b);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    background: linear-gradient(45deg, #93c5fd, #c4b5fd, #7dd3fc, #86efac, #fcd34d);
     background-size: 300% 300%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -382,7 +382,7 @@ body::before {
 
 .login-btn {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
+    color: #1f2937;
     border: none;
     padding: 15px 35px;
     border-radius: 30px;
@@ -418,7 +418,7 @@ body::before {
 }
 
 .teacher-card .login-btn {
-    background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--success-color) 0%, #bbf7d0 100%);
 }
 
 .teacher-card .login-btn:hover {
@@ -426,7 +426,7 @@ body::before {
 }
 
 .student-card .login-btn {
-    background: linear-gradient(135deg, var(--accent-color) 0%, #0891b2 100%);
+    background: linear-gradient(135deg, var(--accent-color) 0%, #bae6fd 100%);
 }
 
 .student-card .login-btn:hover {
@@ -556,7 +556,7 @@ body::before {
 
 .submit-btn {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
+    color: #1f2937;
     border: none;
     padding: 18px 35px;
     border-radius: 12px;
