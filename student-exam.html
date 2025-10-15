@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Exam - Autoscribe</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Student Exam Specific Styles */
+        .exam-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .question-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .timer {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* Question Card */
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .marks {
+            background: linear-gradient(45deg, #6366f1, #4f46e5);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* Voice Input Button */
+        .voice-btn {
+            margin-top: 1rem;
+            background: linear-gradient(45deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .voice-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* Modal Enhancements */
+        .modal-content {
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="index.html" class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <h1>Autoscribe</h1>
+            </a>
+            <div class="user-info">
+                <span id="studentName">Student</span>
+                <button class="btn btn-outline" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <main class="exam-container">
+            <div id="dashboardView">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Available Exams</h2>
+                    </div>
+                    <div id="examsList" class="exam-list">
+                        <!-- Exams will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">My Submissions</h2>
+                    </div>
+                    <div id="submissionsList">
+                        <!-- Submissions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="examView" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 id="examTitle">Sample Mock Exam</h2>
+                        <div class="timer" id="examTimer">Time Left: 10:00</div>
+                    </div>
+                    
+                    <div id="examInstructions" class="card" style="margin-bottom: 1.5rem;">
+                        <h3>Instructions</h3>
+                        <p id="instructionsText">Answer all 5 questions. Each question carries 2 marks. Use the voice input button to record your answer.</p>
+                        <div style="text-align: center; margin-top: 1.5rem;">
+                            <button id="startExamBtn" class="btn btn-primary">Start Exam</button>
+                        </div>
+                    </div>
+                    
+                    <div id="examQuestions" style="display: none;">
+                        <div class="question-navigation">
+                            <button id="prevBtn" class="btn btn-outline" disabled>
+                                <i class="fas fa-arrow-left"></i> Previous
+                            </button>
+                            <div>Question <span id="currentQuestion">1</span> of <span id="totalQuestions">5</span></div>
+                            <button id="nextBtn" class="btn btn-primary">
+                                Next <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="question-header">
+                                <h3>Question <span id="questionNumber">1</span></h3>
+                                <span class="marks" id="questionMarks">(2 marks)</span>
+                            </div>
+                            <p class="question-text" id="questionText">What is the capital of France?</p>
+                            
+                            <textarea id="answerInput" rows="3" placeholder="Your answer will appear here..." style="width: 100%; padding:0.5rem; font-size:1rem;"></textarea>
+                            <button class="voice-btn" id="voiceBtn"><i class="fas fa-microphone"></i> Speak Answer</button>
+                        </div>
+                        
+                        <div style="text-align: right; margin-top: 1.5rem;">
+                            <button id="submitExamBtn" class="btn btn-danger" style="display: none;">
+                                Submit Exam
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Submit Confirmation Modal -->
+    <div id="submitConfirmModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Submit Exam</h3>
+                <span class="close" onclick="document.getElementById('submitConfirmModal').style.display = 'none'">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to submit your exam? You won't be able to make changes after submission.</p>
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+                    <button class="btn btn-outline" id="cancelSubmitBtn">Cancel</button>
+                    <button class="btn btn-danger" id="confirmSubmitBtn">Submit Exam</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submission Details Modal -->
+    <div id="submissionDetailsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Exam Submission</h3>
+                <span class="close" onclick="document.getElementById('submissionDetailsModal').style.display = 'none'">&times;</span>
+            </div>
+            <div class="modal-body">
+                <h4 id="submissionExamTitle">Exam Title</h4>
+                <p><strong>Subject:</strong> <span id="submissionSubject">General Knowledge</span></p>
+                <p><strong>Submitted on:</strong> <span id="submissionDate">2025-10-15</span></p>
+                <p><strong>Grade:</strong> <span id="submissionGrade" class="grade-pending">Pending</span></p>
+                
+                <div style="margin-top: 1.5rem;">
+                    <h4>Your Answers</h4>
+                    <div id="submissionAnswers">
+                        <!-- Answers will be loaded here -->
+                    </div>
+                </div>
+                
+                <div style="text-align: right; margin-top: 1.5rem;">
+                    <button class="btn btn-outline" onclick="document.getElementById('submissionDetailsModal').style.display = 'none'">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock Exam Questions
+        const questions = [
+            { text: "What is the capital of France?", marks: 2 },
+            { text: "Who wrote 'Romeo and Juliet'?", marks: 2 },
+            { text: "What is 7 × 8?", marks: 2 },
+            { text: "Name the largest planet in our solar system.", marks: 2 },
+            { text: "What is the boiling point of water in Celsius?", marks: 2 }
+        ];
+
+        let currentQuestionIndex = 0;
+        let answers = Array(questions.length).fill("");
+
+        const examTitle = document.getElementById("examTitle");
+        const examQuestions = document.getElementById("examQuestions");
+        const startExamBtn = document.getElementById("startExamBtn");
+        const questionNumber = document.getElementById("questionNumber");
+        const questionText = document.getElementById("questionText");
+        const questionMarks = document.getElementById("questionMarks");
+        const answerInput = document.getElementById("answerInput");
+        const currentQuestionSpan = document.getElementById("currentQuestion");
+        const totalQuestionsSpan = document.getElementById("totalQuestions");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const submitExamBtn = document.getElementById("submitExamBtn");
+
+        totalQuestionsSpan.textContent = questions.length;
+
+        function loadQuestion(index) {
+            const q = questions[index];
+            questionNumber.textContent = index + 1;
+            questionText.textContent = q.text;
+            questionMarks.textContent = `(${q.marks} marks)`;
+            answerInput.value = answers[index];
+            currentQuestionSpan.textContent = index + 1;
+
+            prevBtn.disabled = index === 0;
+            nextBtn.textContent = (index === questions.length - 1) ? "Finish" : "Next";
+        }
+
+        startExamBtn.addEventListener("click", () => {
+            examQuestions.style.display = "block";
+            startExamBtn.style.display = "none";
+            loadQuestion(currentQuestionIndex);
+            submitExamBtn.style.display = "inline-block";
+            startTimer(600); // 10 minutes
+        });
+
+        prevBtn.addEventListener("click", () => {
+            answers[currentQuestionIndex] = answerInput.value;
+            if (currentQuestionIndex > 0) currentQuestionIndex--;
+            loadQuestion(currentQuestionIndex);
+        });
+
+        nextBtn.addEventListener("click", () => {
+            answers[currentQuestionIndex] = answerInput.value;
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion(currentQuestionIndex);
+            } else {
+                document.getElementById("submitConfirmModal").style.display = "block";
+            }
+        });
+
+        submitExamBtn.addEventListener("click", () => {
+            document.getElementById("submitConfirmModal").style.display = "block";
+        });
+
+        document.getElementById("confirmSubmitBtn").addEventListener("click", () => {
+            answers[currentQuestionIndex] = answerInput.value;
+            document.getElementById("submitConfirmModal").style.display = "none";
+            document.getElementById("examView").style.display = "none";
+            document.getElementById("dashboardView").style.display = "block";
+
+            // Show submission
+            const submissionDiv = document.getElementById("submissionAnswers");
+            submissionDiv.innerHTML = "";
+            questions.forEach((q, idx) => {
+                const div = document.createElement("div");
+                div.innerHTML = `<strong>Q${idx+1}:</strong> ${q.text}<br><strong>Your Answer:</strong> ${answers[idx]}`;
+                div.style.marginBottom = "1rem";
+                submissionDiv.appendChild(div);
+            });
+
+            document.getElementById("submissionDetailsModal").style.display = "block";
+        });
+
+        document.getElementById("cancelSubmitBtn").addEventListener("click", () => {
+            document.getElementById("submitConfirmModal").style.display = "none";
+        });
+
+        // Timer
+        let timerInterval;
+        function startTimer(duration) {
+            let timer = duration, minutes, seconds;
+            timerInterval = setInterval(() => {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+                document.getElementById("examTimer").textContent = `Time Left: ${minutes}:${seconds}`;
+                if (--timer < 0) {
+                    clearInterval(timerInterval);
+                    alert("Time's up! Submitting exam.");
+                    submitExamBtn.click();
+                }
+            }, 1000);
+        }
+
+        // Voice Input
+        const voiceBtn = document.getElementById("voiceBtn");
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+
+            voiceBtn.addEventListener("click", () => {
+                recognition.start();
+                voiceBtn.textContent = "Listening...";
+            });
+
+            recognition.onresult = (event) => {
+                const speechResult = event.results[0][0].transcript;
+                answerInput.value = speechResult;
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> Speak Answer';
+            };
+
+            recognition.onerror = (event) => {
+                console.error(event.error);
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> Speak Answer';
+            };
+        } else {
+            voiceBtn.disabled = true;
+            voiceBtn.textContent = "Voice Input Not Supported";
+        }
+    </script>
+</body>
+</html>
