@@ -178,3 +178,4 @@ For support and questions, please contact us at support@autoscribe.edu or create
 ---
 
 **Autoscribe** - Making education accessible for everyone.
+"# design-thinking" 
