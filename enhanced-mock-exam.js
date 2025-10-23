@@ -64,12 +64,26 @@ let isListening = false;
 
 // Initialize Speech Recognition
 function initSpeechRecognition() {
+    // Use multilingual voice system if available
+    if (window.initMultilingualVoice) {
+        const currentLang = localStorage.getItem('preferredLanguage') || 'en';
+        return window.initMultilingualVoice(currentLang);
+    }
+    
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = false;
-        recognition.lang = 'en-US';
+        
+        // Get current language
+        const currentLang = localStorage.getItem('preferredLanguage') || 'en';
+        const langCodes = {
+            'en': 'en-US',
+            'hi': 'hi-IN',
+            'ta': 'ta-IN'
+        };
+        recognition.lang = langCodes[currentLang] || 'en-US';
 
         recognition.onresult = function(event) {
             const transcript = event.results[0][0].transcript;
@@ -94,6 +108,12 @@ function initSpeechRecognition() {
 
 // Text-to-Speech Function
 function speak(text, callback) {
+    // Use multilingual speak if available
+    if (window.speak && typeof window.speak === 'function') {
+        window.speak(text, callback);
+        return;
+    }
+    
     if (synthesis.speaking) {
         synthesis.cancel();
     }
@@ -102,7 +122,15 @@ function speak(text, callback) {
     utterance.rate = 0.9;
     utterance.pitch = 1;
     utterance.volume = 1;
-    utterance.lang = 'en-US';
+    
+    // Get current language from multilingual system
+    const currentLang = localStorage.getItem('preferredLanguage') || 'en';
+    const langCodes = {
+        'en': 'en-US',
+        'hi': 'hi-IN',
+        'ta': 'ta-IN'
+    };
+    utterance.lang = langCodes[currentLang] || 'en-US';
 
     if (callback) {
         utterance.onend = callback;
@@ -151,8 +179,17 @@ function startMockExam() {
     loadMockQuestion(0);
     console.log('First question loaded');
 
-    // Speak welcome message
-    speak('Mock exam started. You have 10 minutes to complete 5 questions. Each question is worth 2 marks. I will now read the first question.');
+    // Speak welcome message using multilingual system
+    const currentLang = localStorage.getItem('preferredLanguage') || 'en';
+    if (window.formatMessage) {
+        const welcomeMsg = window.formatMessage('welcome', {
+            duration: '10',
+            questions: '5'
+        });
+        speak(welcomeMsg);
+    } else {
+        speak('Mock exam started. You have 10 minutes to complete 5 questions. Each question is worth 2 marks. I will now read the first question.');
+    }
 }
 
 // Start Timer

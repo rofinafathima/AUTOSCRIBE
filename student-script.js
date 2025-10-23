@@ -212,6 +212,92 @@ function showPreviousQuestion() {
     }
 }
 
+// Language selection function
+function selectLanguage(languageCode) {
+    if (window.changeExamLanguage) {
+        window.changeExamLanguage(languageCode);
+        
+        // Update display
+        const languageNames = {
+            'en': 'English',
+            'hi': 'हिन्दी',
+            'ta': 'தமிழ்'
+        };
+        
+        const displayElement = document.getElementById('current-language-display');
+        if (displayElement) {
+            displayElement.textContent = languageNames[languageCode] || 'English';
+        }
+        
+        // Show confirmation
+        alert(`Language changed to ${languageNames[languageCode]}. Voice commands will now work in this language.`);
+        
+        // Return to dashboard
+        const languageSection = document.getElementById('language-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        if (languageSection && dashboardSection) {
+            languageSection.classList.remove('active');
+            dashboardSection.classList.add('active');
+        }
+    }
+}
+
+// Change language function
+function changeLanguage() {
+    const dashboardSection = document.getElementById('dashboard-section');
+    const languageSection = document.getElementById('language-section');
+    
+    if (dashboardSection && languageSection) {
+        dashboardSection.classList.remove('active');
+        languageSection.classList.add('active');
+    }
+}
+
+// Refresh exams
+function refreshExams() {
+    if (window.loadStudentExams) {
+        window.loadStudentExams();
+        alert('Exams refreshed!');
+    } else {
+        loadAvailableExams();
+        alert('Exams refreshed!');
+    }
+}
+
+// Test microphone
+function testMicrophone() {
+    if (window.speak) {
+        window.speak('Microphone test. If you can hear this, your microphone is working correctly.');
+    } else {
+        alert('Testing microphone... Please check your browser console.');
+    }
+}
+
+// Show help
+function showHelp() {
+    const dashboardSection = document.getElementById('dashboard-section');
+    const helpSection = document.getElementById('help-section');
+    
+    if (dashboardSection && helpSection) {
+        dashboardSection.classList.remove('active');
+        helpSection.classList.add('active');
+    }
+}
+
+// Load available exams
+function loadAvailableExams() {
+    // This will be handled by exam-connector.js
+    if (window.loadStudentExams) {
+        window.loadStudentExams();
+    }
+}
+
+// Load submissions
+function loadSubmissions() {
+    // This will be handled by exam-connector.js
+    console.log('Loading student submissions...');
+}
+
 // Export functions globally
 window.startMockExam = startMockExam;
 window.startExam = startExam;
@@ -219,3 +305,10 @@ window.showNextQuestion = showNextQuestion;
 window.showPreviousQuestion = showPreviousQuestion;
 window.submitExam = submitExam;
 window.selectOption = selectOption;
+window.selectLanguage = selectLanguage;
+window.changeLanguage = changeLanguage;
+window.refreshExams = refreshExams;
+window.testMicrophone = testMicrophone;
+window.showHelp = showHelp;
+window.loadAvailableExams = loadAvailableExams;
+window.loadSubmissions = loadSubmissions;

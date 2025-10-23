@@ -228,8 +228,16 @@ function loadExamQuestions(exam) {
     // Start timer
     startExamTimer(exam.duration * 60);
 
-    // Speak exam instructions
-    if (window.speechSynthesis) {
+    // Speak exam instructions using multilingual system
+    if (window.formatMessage) {
+        const welcomeMsg = window.formatMessage('welcome', {
+            duration: exam.duration,
+            questions: exam.questions.length
+        });
+        if (window.speak) {
+            window.speak(welcomeMsg);
+        }
+    } else if (window.speechSynthesis) {
         const utterance = new SpeechSynthesisUtterance(
             `Starting exam: ${exam.name}. You have ${exam.duration} minutes to complete ${exam.questions.length} questions. Good luck!`
         );
@@ -290,8 +298,24 @@ function loadExamQuestion(index) {
         nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
     }
 
-    // Speak question
-    if (window.speechSynthesis) {
+    // Speak question using multilingual system
+    if (window.speak && window.formatMessage) {
+        let questionText = window.formatMessage('questionPrefix', {
+            number: index + 1,
+            total: exam.questions.length
+        }) + ' ' + question.text + '. ';
+        
+        if (question.options) {
+            questionText += window.formatMessage('optionsPrefix', {}) + ' ';
+            question.options.forEach((option, idx) => {
+                questionText += window.formatMessage('optionFormat', {
+                    letter: String.fromCharCode(65 + idx),
+                    text: option
+                }) + ' ';
+            });
+        }
+        window.speak(questionText);
+    } else if (window.speechSynthesis) {
         let questionText = `Question ${index + 1}. ${question.text}. `;
         if (question.options) {
             questionText += 'The options are: ';
@@ -394,6 +418,55 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Navigation functions for regular exams
+function nextQuestion() {
+    if (!window.currentExamState) return;
+    
+    const currentIndex = window.currentExamState.currentQuestionIndex;
+    const totalQuestions = window.currentExamState.exam.questions.length;
+    
+    if (currentIndex < totalQuestions - 1) {
+        loadExamQuestion(currentIndex + 1);
+    } else {
+        // Last question - submit
+        if (confirm('This is the last question. Do you want to submit your exam?')) {
+            submitCurrentExam();
+        }
+    }
+}
+
+function previousQuestion() {
+    if (!window.currentExamState) return;
+    
+    const currentIndex = window.currentExamState.currentQuestionIndex;
+    
+    if (currentIndex > 0) {
+        loadExamQuestion(currentIndex - 1);
+    }
+}
+
+// Mark for review
+function markForReview() {
+    if (!window.currentExamState) return;
+    
+    const currentIndex = window.currentExamState.currentQuestionIndex;
+    const question = window.currentExamState.exam.questions[currentIndex];
+    
+    if (!window.currentExamState.markedForReview) {
+        window.currentExamState.markedForReview = [];
+    }
+    
+    const isMarked = window.currentExamState.markedForReview.includes(question.id);
+    
+    if (isMarked) {
+        window.currentExamState.markedForReview = window.currentExamState.markedForReview.filter(id => id !== question.id);
+        alert('Question unmarked for review');
+    } else {
+        window.currentExamState.markedForReview.push(question.id);
+        alert('Question marked for review');
+    }
+}
+
 // Export functions
 window.saveExamToStorage = saveExamToStorage;
 window.getAllExamsFromStorage = getAllExamsFromStorage;
@@ -401,3 +474,7 @@ window.getAvailableExamsForStudent = getAvailableExamsForStudent;
 window.startExamById = startExamById;
 window.submitCurrentExam = submitCurrentExam;
 window.loadStudentExams = loadStudentExams;
+window.nextQuestion = nextQuestion;
+window.previousQuestion = previousQuestion;
+window.markForReview = markForReview;
+window.selectExamOption = selectExamOption;

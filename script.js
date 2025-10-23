@@ -322,16 +322,31 @@ document.addEventListener('keydown', function(e) {
 
 // Store user data in localStorage for session management
 function storeUserData(userData) {
+    // Store with both keys for compatibility
     localStorage.setItem('autoscribe_user', JSON.stringify(userData));
+    localStorage.setItem('currentUser', JSON.stringify({
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        role: userData.type,
+        class: userData.class || '',
+        language: userData.language || 'en'
+    }));
+    
+    // Also store preferred language
+    if (userData.language) {
+        localStorage.setItem('preferredLanguage', userData.language);
+    }
 }
 
 function getUserData() {
-    const userData = localStorage.getItem('autoscribe_user');
+    const userData = localStorage.getItem('autoscribe_user') || localStorage.getItem('currentUser');
     return userData ? JSON.parse(userData) : null;
 }
 
 function clearUserData() {
     localStorage.removeItem('autoscribe_user');
+    localStorage.removeItem('currentUser');
 }
 
 // Export functions for use in other pages

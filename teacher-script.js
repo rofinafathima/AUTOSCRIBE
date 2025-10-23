@@ -69,6 +69,7 @@ function showSection(sectionName) {
             break;
         case 'schedule':
             loadScheduledExams();
+            populateScheduleExamSelect();
             break;
         case 'attendance':
             loadAttendanceExams();
@@ -76,8 +77,6 @@ function showSection(sectionName) {
         case 'create':
             loadCreateExam();
             break;
-    }
-}
     }
 }
 
@@ -556,31 +555,37 @@ function saveCreatedExam() {
         description: createdExam.description,
         difficulty: createdExam.difficulty,
         status: 'available',
-        questions: createdExam.questions.map(q => ({
-            id: q.id,
+        questions: createdExam.questions.map((q, idx) => ({
+            id: idx + 1,
             text: q.text,
             options: q.options,
-            correct: q.correct
+            correct: q.correct,
+            marks: 2
         })),
         createdAt: new Date(),
         scheduledStart: null,
         scheduledEnd: null
     };
     
-    // Add to exams array
-    exams.push(newExam);
-    
-    // Update exam select dropdowns
-    updateExamSelects();
-    
-    // Clear the form
-    clearExam();
-    
-    alert('Exam created successfully!');
-    
-    // Switch to dashboard to see the new exam
-    showSection('dashboard');
-    loadDashboardData();
+    // Save to storage using exam-connector
+    if (saveExamToStorage(newExam)) {
+        alert('Exam created and saved successfully! It will now appear in the student panel.');
+        
+        // Add to local exams array
+        exams.push(newExam);
+        
+        // Update exam select dropdowns
+        updateExamSelects();
+        
+        // Clear the form
+        clearExam();
+        
+        // Switch to dashboard to see the new exam
+        showSection('dashboard');
+        loadDashboardData();
+    } else {
+        alert('Error saving exam. Please try again.');
+    }
 }
 
 function previewCreatedExam() {
@@ -667,4 +672,250 @@ function clearExam() {
         type: 'Multiple Choice',
         questions: []
     };
+}
+
+// Load dashboard data
+function loadDashboardData() {
+    const allExams = getAllExamsFromStorage();
+    const currentUser = getUserData();
+    
+    // Filter exams by current teacher if logged in
+    const teacherExams = currentUser ? allExams.filter(e => e.teacherId === currentUser.id) : allExams;
+    
+    // Update stats
+    document.getElementById('total-exams').textContent = teacherExams.length;
+    document.getElementById('active-exams').textContent = teacherExams.filter(e => e.status === 'available').length;
+    document.getElementById('total-students').textContent = '150'; // Mock data
+    document.getElementById('completion-rate').textContent = '85%'; // Mock data
+    
+    loadRecentExams();
+    loadUpcomingExams();
+}
+
+// Load recent exams
+function loadRecentExams() {
+    const allExams = getAllExamsFromStorage();
+    const recentExams = allExams.slice(-5).reverse();
+    
+    const container = document.getElementById('recent-exams-list');
+    if (!container) return;
+    
+    if (recentExams.length === 0) {
+        container.innerHTML = '<p>No exams created yet.</p>';
+        return;
+    }
+    
+    container.innerHTML = recentExams.map(exam => `
+        <div class="exam-item">
+            <h4>${exam.name}</h4>
+            <p><i class="fas fa-calendar"></i> ${exam.date}</p>
+            <p><i class="fas fa-clock"></i> ${exam.duration} minutes</p>
+            <span class="status ${exam.status}">${exam.status}</span>
+        </div>
+    `).join('');
+}
+
+// Load upcoming exams
+function loadUpcomingExams() {
+    const allExams = getAllExamsFromStorage();
+    const upcomingExams = allExams.filter(e => e.status === 'scheduled' || e.status === 'available');
+    
+    const container = document.getElementById('upcoming-exams-list');
+    if (!container) return;
+    
+    if (upcomingExams.length === 0) {
+        container.innerHTML = '<p>No upcoming exams.</p>';
+        return;
+    }
+    
+    container.innerHTML = upcomingExams.map(exam => `
+        <div class="exam-item">
+            <h4>${exam.name}</h4>
+            <p><i class="fas fa-calendar"></i> ${exam.date}</p>
+            <p><i class="fas fa-clock"></i> ${exam.duration} minutes</p>
+            <span class="status ${exam.status}">${exam.status}</span>
+        </div>
+    `).join('');
+}
+
+// Load exams
+function loadExams() {
+    const allExams = getAllExamsFromStorage();
+    exams = allExams;
+    
+    const container = document.getElementById('uploads-list');
+    if (!container) return;
+    
+    if (exams.length === 0) {
+        container.innerHTML = '<p>No exams uploaded yet.</p>';
+        return;
+    }
+    
+    container.innerHTML = exams.map(exam => `
+        <div class="upload-item">
+            <div class="upload-info">
+                <h4>${exam.name}</h4>
+                <p><i class="fas fa-calendar"></i> ${exam.date}</p>
+                <p><i class="fas fa-question-circle"></i> ${exam.questions ? exam.questions.length : 0} questions</p>
+            </div>
+            <div class="upload-actions">
+                <button onclick="editExam('${exam.id}')" class="btn-edit">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button onclick="deleteExam('${exam.id}')" class="btn-delete">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Update exam select dropdowns
+function updateExamSelects() {
+    const allExams = getAllExamsFromStorage();
+    
+    // Update schedule exam select
+    const scheduleSelect = document.getElementById('schedule-exam-select');
+    if (scheduleSelect) {
+        scheduleSelect.innerHTML = '<option value="">Choose an exam to schedule</option>' +
+            allExams.map(exam => `<option value="${exam.id}">${exam.name}</option>`).join('');
+    }
+    
+    // Update attendance exam select
+    const attendanceSelect = document.getElementById('attendance-exam-select');
+    if (attendanceSelect) {
+        attendanceSelect.innerHTML = '<option value="">Choose an exam</option>' +
+            allExams.map(exam => `<option value="${exam.id}">${exam.name}</option>`).join('');
+    }
+}
+
+// Populate schedule exam select
+function populateScheduleExamSelect() {
+    updateExamSelects();
+}
+
+// Get user data
+function getUserData() {
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+        return JSON.parse(userData);
+    }
+    // Return default teacher for demo
+    return {
+        id: 'T001',
+        name: 'Dr. Sarah Johnson',
+        email: 'teacher1@autoscribe.edu',
+        role: 'teacher'
+    };
+}
+
+// Setup file upload
+function setupFileUpload() {
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('exam-pdf');
+    
+    if (uploadArea && fileInput) {
+        // Drag and drop handlers
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#4F46E5';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#D1D5DB';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#D1D5DB';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                updateFileName(fileInput);
+            }
+        });
+    }
+}
+
+// Update file name display
+function updateFileName(input) {
+    const fileName = input.files[0]?.name;
+    const fileNameDisplay = document.getElementById('file-name');
+    if (fileNameDisplay && fileName) {
+        fileNameDisplay.textContent = fileName;
+    }
+}
+
+// Upload exam
+function uploadExam() {
+    const name = document.getElementById('exam-name').value;
+    const date = document.getElementById('exam-date').value;
+    const duration = document.getElementById('exam-duration').value;
+    const subject = document.getElementById('exam-subject').value;
+    const description = document.getElementById('exam-description').value;
+    const difficulty = document.getElementById('exam-difficulty').value;
+    const fileInput = document.getElementById('exam-pdf');
+    
+    if (!name || !date || !duration || !subject) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    
+    if (!fileInput.files[0]) {
+        alert('Please select a PDF file.');
+        return;
+    }
+    
+    // Create exam object (simplified - in real app would parse PDF)
+    const exam = {
+        id: 'EXAM' + Date.now(),
+        name: name,
+        teacherId: getUserData().id,
+        date: date,
+        duration: parseInt(duration),
+        subject: subject,
+        description: description,
+        difficulty: difficulty,
+        status: 'available',
+        questions: [], // Would be populated from PDF parsing
+        createdAt: new Date(),
+        scheduledStart: null,
+        scheduledEnd: null
+    };
+    
+    // Save to storage
+    if (saveExamToStorage(exam)) {
+        alert('Exam uploaded successfully!');
+        resetUploadForm();
+        loadExams();
+        loadDashboardData();
+    } else {
+        alert('Error uploading exam.');
+    }
+}
+
+// Reset upload form
+function resetUploadForm() {
+    document.getElementById('exam-upload-form').reset();
+    const fileNameDisplay = document.getElementById('file-name');
+    if (fileNameDisplay) {
+        fileNameDisplay.textContent = 'Drop PDF files here or click to browse';
+    }
+}
+
+// Edit exam
+function editExam(examId) {
+    alert('Edit functionality coming soon!');
+}
+
+// Delete exam
+function deleteExam(examId) {
+    if (confirm('Are you sure you want to delete this exam?')) {
+        const allExams = getAllExamsFromStorage();
+        const updatedExams = allExams.filter(e => e.id !== examId);
+        localStorage.setItem('autoscribe_exams', JSON.stringify(updatedExams.filter(e => !demoExams.find(de => de.id === e.id))));
+        loadExams();
+        loadDashboardData();
+        alert('Exam deleted successfully!');
+    }
 }

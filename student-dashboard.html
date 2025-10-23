@@ -331,21 +331,20 @@
                             <h3>English</h3>
                             <p>English language support</p>
                         </div>
-                        <div class="language-card" onclick="selectLanguage('es')">
-                            <div class="language-flag">🇪🇸</div>
-                            <h3>Español</h3>
-                            <p>Soporte en español</p>
+                        <div class="language-card" onclick="selectLanguage('hi')">
+                            <div class="language-flag">🇮🇳</div>
+                            <h3>हिन्दी</h3>
+                            <p>हिन्दी भाषा समर्थन</p>
                         </div>
-                        <div class="language-card" onclick="selectLanguage('fr')">
-                            <div class="language-flag">🇫🇷</div>
-                            <h3>Français</h3>
-                            <p>Support en français</p>
+                        <div class="language-card" onclick="selectLanguage('ta')">
+                            <div class="language-flag">🇮🇳</div>
+                            <h3>தமிழ்</h3>
+                            <p>தமிழ் மொழி ஆதரவு</p>
                         </div>
-                        <div class="language-card" onclick="selectLanguage('de')">
-                            <div class="language-flag">🇩🇪</div>
-                            <h3>Deutsch</h3>
-                            <p>Deutsche Unterstützung</p>
-                        </div>
+                    </div>
+                    <div class="language-info">
+                        <h3>Current Language: <span id="current-language-display">English</span></h3>
+                        <p>Voice commands will work in your selected language.</p>
                     </div>
                 </div>
             </section>
@@ -416,6 +415,7 @@
 
     <script src="demo-data.js"></script>
     <script src="exam-connector.js"></script>
+    <script src="multilingual-voice.js"></script>
     <script src="script.js"></script>
     <script src="student-script.js"></script>
     <script src="mock-exam.js"></script>
